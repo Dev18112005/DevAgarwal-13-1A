@@ -1,0 +1,19 @@
+const API='/api';
+const token=()=>localStorage.getItem('token');
+const currentUser=()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}};
+const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(n||0);
+async function api(url,options={}){const headers={'Content-Type':'application/json',...(options.headers||{})};if(token())headers.Authorization='Bearer '+token();const r=await fetch(API+url,{...options,headers});let data={};try{data=await r.json()}catch{}if(!r.ok)throw new Error(data.message||'Request failed');return data}
+function getCart(){try{return JSON.parse(localStorage.getItem('cart')||'[]')}catch{return []}}
+function saveCart(cart){localStorage.setItem('cart',JSON.stringify(cart));updateCartCount()}
+function updateCartCount(){const count=getCart().reduce((s,i)=>s+i.quantity,0);document.querySelectorAll('#cartCount').forEach(e=>e.textContent=count)}
+function addToCart(product){const cart=getCart();const found=cart.find(i=>i._id===product._id);if(found)found.quantity++;else cart.push({...product,quantity:1});saveCart(cart);alert('Added to cart')}
+function logout(){localStorage.removeItem('token');localStorage.removeItem('user');location.href='/'}
+function updateHeader(){const u=currentUser();const userLabel=document.getElementById('userLabel'),authBtn=document.getElementById('authBtn'),sellerLink=document.getElementById('sellerLink');if(userLabel)userLabel.textContent=u?u.name:'Guest';if(authBtn){authBtn.textContent=u?'Logout':'Login';authBtn.onclick=()=>u?logout():location.href='/login.html'}if(sellerLink&&u?.role==='seller')sellerLink.classList.remove('hidden');updateCartCount()}
+document.addEventListener('DOMContentLoaded',updateHeader);
+async function loadProducts(){const grid=document.getElementById('productGrid');if(!grid)return;let products=[];try{products=await api('/products')}catch(e){grid.innerHTML='<p class="muted">Could not load products. Check server and MongoDB.</p>';return}let cats=['All',...new Set(products.map(p=>p.category||'General'))];const catBox=document.getElementById('categories');let active='All';function draw(){const query=(document.getElementById('search')?.value||'').toLowerCase();const filtered=products.filter(p=>(active==='All'||p.category===active)&&p.name.toLowerCase().includes(query));grid.innerHTML=filtered.length?filtered.map(p=>`<article class="product-card"><div class="product-image">${p.image?`<img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" onerror="this.style.display='none'">`:`<span class="emoji">🛍️</span>`}</div><div class="product-info"><span class="category">${escapeHTML(p.category||'General')} · ${p.stock} in stock</span><h3>${escapeHTML(p.name)}</h3><p>${escapeHTML(p.description||'')}</p><div class="price-row"><span class="price">${money(p.price)}</span><button class="add-btn" ${p.stock<=0?'disabled':''} onclick="addToCart(${JSON.stringify(p).replaceAll('"','&quot;')})">${p.stock>0?'Add to cart':'Out of stock'}</button></div></div></article>`).join(''):'<p>No matching products found.</p>'; }
+if(catBox)catBox.innerHTML=cats.map(c=>`<button class="chip ${c==='All'?'active':''}" data-cat="${escapeHTML(c)}">${escapeHTML(c)}</button>`).join('');
+catBox?.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{active=b.dataset.cat;catBox.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x===b));draw()});
+document.getElementById('search')?.addEventListener('input',draw);draw();}
+function escapeHTML(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+window.api=api;window.money=money;window.getCart=getCart;window.saveCart=saveCart;window.addToCart=addToCart;window.updateCartCount=updateCartCount;window.currentUser=currentUser;window.logout=logout;window.escapeHTML=escapeHTML;
+document.addEventListener('DOMContentLoaded',loadProducts);

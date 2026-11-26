@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Random Joke Generator</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #263b5b;
+            color: white;
+            padding: 25px;
+        }
+
+        .container {
+            margin: 80px auto;
+            width: 80%;
+            max-width: 600px;
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px #ccc;
+        }
+
+        h2 {
+            color: #263b5b;
+        }
+
+        #setup {
+            font-size: 22px;
+            margin: 25px 0;
+            color: #333;
+        }
+
+        #punchline {
+            font-size: 20px;
+            color: #457b9d;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        button {
+            background: #457b9d;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #263b5b;
+        }
+
+        footer {
+            margin-top: 40px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>😂 Random Joke Generator</h1>
+    <p>Get a random joke and make your day fun!</p>
+</header>
+
+<div class="container">
+    <h2>Random Joke</h2>
+
+    <p id="setup">Click the button to get a joke.</p>
+
+    <p id="punchline"></p>
+
+    <button onclick="getJoke()">Get Another Joke</button>
+</div>
+
+<footer>
+    Random Joke Generator | Data fetched using API
+</footer>
+
+
+<script>
+    async function getJoke() {
+        const setup = document.getElementById("setup");
+        const punchline = document.getElementById("punchline");
+
+        setup.innerText = "Loading joke...";
+        punchline.innerText = "";
+
+        try {
+            const response = await fetch(
+                "https://v2.jokeapi.dev/joke/Any?type=twopart&safe-mode"
+            );
+
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error("API error");
+            }
+
+            setup.innerText = data.setup;
+            punchline.innerText = data.delivery;
+
+        } catch (error) {
+            setup.innerText = "Unable to fetch joke.";
+            punchline.innerText = "Please check your internet connection.";
+            console.log(error);
+        }
+    }
+
+    getJoke();
+</script>
+
+</body>
+</html>

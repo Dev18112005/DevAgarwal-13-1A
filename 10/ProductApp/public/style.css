@@ -1,0 +1,46 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 30px;
+    background: #f2f2f2;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+form {
+    background: white;
+    padding: 20px;
+    margin: auto;
+    max-width: 400px;
+    border-radius: 10px;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0;
+}
+
+button {
+    padding: 10px 15px;
+    background: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#productList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.product {
+    background: white;
+    padding: 15px;
+    width: 200px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px gray;
+}

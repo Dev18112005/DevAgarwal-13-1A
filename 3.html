@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef2ff;
+            text-align: center;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            width: 450px;
+            max-width: 100%;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px #ccc;
+        }
+
+        h2 {
+            color: #334155;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 65%;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin: 3px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .add {
+            background: #4f46e5;
+            color: white;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #f1f5f9;
+            padding: 10px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 8px;
+        }
+
+        .task {
+            flex: 1;
+            text-align: left;
+            word-break: break-word;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .up, .down {
+            background: #dbeafe;
+        }
+
+        .delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>To-Do List</h2>
+
+    <input type="text" id="taskInput" placeholder="Enter a task">
+    <button class="add" onclick="addTask()">Add</button>
+
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+    function addTask() {
+        let input = document.getElementById("taskInput");
+        let task = input.value.trim();
+
+        if (task === "") {
+            alert("Please enter a task!");
+            return;
+        }
+
+        let li = document.createElement("li");
+
+        // Checkbox
+        let checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+
+        // Task text
+        let span = document.createElement("span");
+        span.className = "task";
+        span.textContent = task;
+
+        checkbox.onchange = function() {
+            span.classList.toggle("completed", checkbox.checked);
+        };
+
+        // Move Up
+        let upBtn = document.createElement("button");
+        upBtn.textContent = "↑";
+        upBtn.className = "up";
+
+        upBtn.onclick = function() {
+            let previous = li.previousElementSibling;
+            if (previous) {
+                li.parentNode.insertBefore(li, previous);
+            }
+        };
+
+        // Move Down
+        let downBtn = document.createElement("button");
+        downBtn.textContent = "↓";
+        downBtn.className = "down";
+
+        downBtn.onclick = function() {
+            let next = li.nextElementSibling;
+            if (next) {
+                li.parentNode.insertBefore(next, li);
+            }
+        };
+
+        // Delete
+        let deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "✕";
+        deleteBtn.className = "delete";
+
+        deleteBtn.onclick = function() {
+            li.remove();
+        };
+
+        // Append elements
+        li.appendChild(checkbox);
+        li.appendChild(span);
+        li.appendChild(upBtn);
+        li.appendChild(downBtn);
+        li.appendChild(deleteBtn);
+
+        document.getElementById("taskList").appendChild(li);
+
+        input.value = "";
+        input.focus();
+    }
+
+    // Add task by pressing Enter
+    document.getElementById("taskInput").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            addTask();
+        }
+    });
+</script>
+
+</body>
+</html>

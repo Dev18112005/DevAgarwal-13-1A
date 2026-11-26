@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Finder</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f2f5fa;
+            color: #222;
+        }
+
+        header {
+            background: #1d3557;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px #ccc;
+            text-align: center;
+        }
+
+        .search-box input {
+            width: 70%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .search-box button {
+            padding: 12px 20px;
+            background: #457b9d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .search-box button:hover {
+            background: #1d3557;
+        }
+
+        #message {
+            text-align: center;
+            margin: 20px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        #universityList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px #ddd;
+            border-left: 5px solid #457b9d;
+        }
+
+        .card h3 {
+            color: #1d3557;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .card a {
+            color: #0077b6;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .card a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+
+        @media(max-width: 600px) {
+            .search-box input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .search-box button {
+                width: 100%;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>University Finder</h1>
+    <p>Find universities around the world</p>
+</header>
+
+<div class="container">
+
+    <div class="search-box">
+        <input type="text" id="countryInput"
+               placeholder="Enter country (e.g. India, USA, Canada)">
+        <button onclick="searchUniversities()">Search</button>
+    </div>
+
+    <p id="message"></p>
+
+    <div id="universityList"></div>
+
+</div>
+
+<footer>
+    University Finder | Data fetched using API
+</footer>
+
+<script>
+async function searchUniversities() {
+    const country = document.getElementById("countryInput").value.trim();
+    const list = document.getElementById("universityList");
+    const message = document.getElementById("message");
+
+    list.innerHTML = "";
+
+    if (country === "") {
+        message.innerText = "Please enter a country name.";
+        return;
+    }
+
+    message.innerText = "Loading universities...";
+
+    try {
+        const apiURL =
+            "https://raw.githubusercontent.com/Hipo/university-domains-list/master/world_universities_and_domains.json";
+
+        const response = await fetch(apiURL);
+
+        if (!response.ok) {
+            throw new Error("Unable to load university data");
+        }
+
+        const allUniversities = await response.json();
+
+        // Filter universities according to country name
+        const data = allUniversities.filter(university =>
+            university.country.toLowerCase() === country.toLowerCase()
+        );
+
+        if (data.length === 0) {
+            message.innerText = "No universities found for " + country;
+            return;
+        }
+
+        message.innerText = "Total Universities Found: " + data.length;
+
+        data.forEach(university => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const name = document.createElement("h3");
+            name.textContent = university.name;
+
+            const state = document.createElement("p");
+            state.innerHTML = "<strong>State:</strong> " +
+                (university["state-province"] || "Not available");
+
+            const websiteLabel = document.createElement("p");
+            websiteLabel.innerHTML = "<strong>Website:</strong>";
+
+            const link = document.createElement("a");
+            const website = university.web_pages?.[0];
+
+            if (website) {
+                link.href = website;
+                link.textContent = website;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+            } else {
+                link.textContent = "Not available";
+            }
+
+            card.appendChild(name);
+            card.appendChild(state);
+            card.appendChild(websiteLabel);
+            card.appendChild(link);
+
+            list.appendChild(card);
+        });
+
+    } catch (error) {
+        message.innerText =
+            "Unable to fetch data. Check your internet connection.";
+        console.error("API Error:", error);
+    }
+}
+
+// Search using Enter key
+document.getElementById("countryInput").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        searchUniversities();
+    }
+});
+</script>
+
+</body>
+</html>

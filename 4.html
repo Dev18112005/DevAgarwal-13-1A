@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chess Board</title>
+</head>
+<body>
+
+<script>
+    // Create heading
+    let heading = document.createElement("h2");
+    heading.innerHTML = "Chess Board";
+    heading.style.textAlign = "center";
+    document.body.appendChild(heading);
+
+    // Create chessboard
+    let board = document.createElement("div");
+
+    board.style.width = "400px";
+    board.style.height = "400px";
+    board.style.display = "grid";
+    board.style.gridTemplateColumns = "repeat(8, 50px)";
+    board.style.gridTemplateRows = "repeat(8, 50px)";
+    board.style.border = "2px solid black";
+    board.style.margin = "auto";
+
+    // Create 64 boxes
+    for (let i = 0; i < 64; i++) {
+        let box = document.createElement("div");
+
+        // Apply chessboard colors
+        let row = Math.floor(i / 8);
+        let col = i % 8;
+
+        if ((row + col) % 2 == 0) {
+            box.style.backgroundColor = "white";
+        } else {
+            box.style.backgroundColor = "black";
+        }
+
+        box.style.width = "50px";
+        box.style.height = "50px";
+
+        board.appendChild(box);
+    }
+
+    // Add board to webpage
+    document.body.appendChild(board);
+</script>
+
+</body>
+</html>
